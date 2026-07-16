@@ -1,16 +1,31 @@
-# event_hopper
+# Event Hopper — Events Discovery App
 
-A new Flutter project.
+A responsive **Flutter** app for browsing events, viewing them on a map, and saving favorites.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- 🗺️ **Map view** — events plotted with Google Maps (`google_maps_flutter`), device location via `geolocator`
+- 📅 **Event details** — full event pages with external links (`url_launcher`)
+- ⭐ **Favorites** — saved locally with **Hive**, including a custom `LatLng` type adapter
+- 👤 Profile screen, splash, and a shell with bottom navigation
+- 🖥️ Desktop-aware (window sizing via `window_manager`)
 
-A few resources to get you started if this is your first Flutter project:
+## Stack
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+**Provider** + **get_it**, Hive persistence, feature screens under a main shell.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+lib/
+├── models/      # event model (+ Hive adapter)
+├── Adapters/    # custom LatLng Hive adapter
+├── providers/   # event state
+└── screens/     # home, map, details, favorites, profile, splash
+```
+
+## Run it
+
+```bash
+flutter pub get
+# add your Google Maps API key (Android/iOS config)
+flutter run
+```
