@@ -29,3 +29,22 @@ flutter pub get
 # add your Google Maps API key (Android/iOS config)
 flutter run
 ```
+
+## 📦 Packages
+
+| Package | Version |
+|---|---|
+| `provider` | ^6.1.2 |
+| `get_it` | ^8.0.2 |
+| `hive_flutter` | ^1.1.0 |
+| `window_manager` | ^0.4.3 |
+| `path_provider` | ^2.1.5 |
+| `intl` | ^0.20.1 |
+| `google_maps_flutter` | ^2.10.0 |
+| `location` | ^7.0.1 |
+| `geolocator` | ^13.0.2 |
+| `url_launcher` | ^6.3.1 |
+| `logger` | ^1.0.0 |
+| `shared_preferences` | ^2.3.4 |
+| `cupertino_icons` | ^1.0.8 |
+
