@@ -12,7 +12,7 @@ A responsive **Flutter** app for browsing events, viewing them on a map, and sav
 - 🌍 **Arabic (RTL) and English** (`easy_localization`) — Arabic by default, switchable from the main screens
 - 🖥️ Desktop-aware — navigation rail instead of the bottom bar (the map itself runs on Android and iOS only)
 
-The events are six demo events seeded into Hive on first launch; there is no backend.
+The events are six demo events seeded into Hive on first launch; there is no backend. They are stored in English and shown in Arabic when the interface is Arabic (`lib/models/event_text.dart`).
 
 ## Screenshots
 
@@ -20,8 +20,8 @@ The events are six demo events seeded into Hive on first launch; there is no bac
 |---|---|
 | ![Arabic screens](docs/screenshots/arabic.jpg) | ![English screens](docs/screenshots/english.jpg) |
 
-Rendered from the real screens with sample data by `tool/screens_golden_test.dart`.
-The Google map cannot render off-screen, so the test draws a plain grid with the event pins in its place. The English sheet shows the demo events the app seeds; the Arabic sheet shows the same six events translated.
+Rendered from the real screens with the app's own demo events by `tool/screens_golden_test.dart`.
+The Google map cannot render off-screen, so the test draws a plain grid with the event pins in its place.
 
 ## Stack
 

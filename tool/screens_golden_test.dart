@@ -1,4 +1,4 @@
-// Renders the redesigned screens off-screen with sample data, in Arabic and English.
+// Renders the redesigned screens off-screen with the app's own demo events, in Arabic and English.
 // Run: flutter test --update-goldens tool/screens_golden_test.dart  (PNGs land in tool/shots/)
 import 'dart:io';
 import 'dart:math' as math;
@@ -23,68 +23,6 @@ import 'package:logger/logger.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-EventModel event(
-  String title,
-  String image,
-  DateTime dateTime,
-  String location,
-  String city,
-  String country,
-  LatLng position,
-  String about,
-) =>
-    EventModel(
-      title: title,
-      imagePath: 'assets/images/$image.jpg',
-      dateTime: dateTime,
-      location: location,
-      about: about,
-      city: city,
-      country: country,
-      googleMapsLocation: position,
-    );
-
-// The English run uses the demo events the app seeds itself (HiveService.addMockData).
-// These are the same six events in Arabic, stored before the app loads them.
-final arabicEvents = [
-  event(
-    'معرض فني: روائع العالم الحديث', 'art', DateTime(2024, 12, 30, 10, 0),
-    'معرض الفن الحديث، سان فرانسيسكو، الولايات المتحدة', 'سان فرانسيسكو', 'الولايات المتحدة',
-    const LatLng(37.7749, -122.4194),
-    'مجموعة مختارة من أفضل أعمال الفن المعاصر لفنانين يرسمون ملامح مستقبل الثقافة البصرية. يضم المعرض أعمالًا تفاعلية ومنحوتات ولوحات تتحدى الأفكار المألوفة، ولكل عمل حكايته بين التجريد والواقعية.',
-  ),
-  event(
-    'مؤتمر التقنية 2024: الابتكار في الذكاء الاصطناعي', 'conference', DateTime(2024, 11, 5, 9, 0),
-    'مركز مؤتمرات وادي السيليكون، سان خوسيه، الولايات المتحدة', 'سان خوسيه', 'الولايات المتحدة',
-    const LatLng(37.3382, -121.8863),
-    'يلتقي المهتمون بالتقنية ورواد الأعمال وقادة الصناعة لمناقشة أحدث التطورات في الذكاء الاصطناعي وتعلّم الآلة وعلوم البيانات، مع كلمات رئيسية وورش عمل وجلسات حوارية.',
-  ),
-  event(
-    'مهرجان المشروبات والكوكتيلات 2024', 'drinks', DateTime(2024, 9, 20, 17, 0),
-    'القاعة الكبرى، شيكاغو، الولايات المتحدة', 'شيكاغو', 'الولايات المتحدة',
-    const LatLng(41.8781, -87.6298),
-    'مهرجان لعشاق المشروبات يقدّم تشكيلات حصرية يعدّها خبراء من أنحاء العالم، مع ورش عن فن التحضير وأحدث اتجاهات الصناعة، وركن واسع للمشروبات الخالية من الكحول.',
-  ),
-  event(
-    'مهرجان الموسيقى 2024: صوت الغد', 'music', DateTime(2024, 8, 15, 14, 0),
-    'سنترال بارك، نيويورك، الولايات المتحدة', 'نيويورك', 'الولايات المتحدة',
-    const LatLng(40.7851, -73.9683),
-    'احتفال بالموسيقى من كل أنحاء العالم، من الإيقاعات الإلكترونية إلى الروك والهيب هوب والموسيقى الكلاسيكية. مسارح متعددة وأجواء نابضة وفرق معروفة وأخرى صاعدة، إلى جانب عروض فنية وراقصة وتجارب طعام متنوعة.',
-  ),
-  event(
-    'البطولة الرياضية الدولية 2024', 'sports', DateTime(2024, 6, 18, 10, 0),
-    'الملعب الأولمبي، لندن، المملكة المتحدة', 'لندن', 'المملكة المتحدة',
-    const LatLng(51.5074, -0.1278),
-    'نخبة من أفضل رياضيي العالم يتنافسون في ألعاب القوى والسباحة والجمباز والألعاب الجماعية، مع مناطق للمشجعين وعروض رياضية وفرصة للقاء النجوم.',
-  ),
-  event(
-    'معرض التقنية 2024: مستقبل التقنية والاستدامة', 'technology', DateTime(2024, 10, 25, 11, 0),
-    'مركز مؤتمرات لاس فيغاس، لاس فيغاس، الولايات المتحدة', 'لاس فيغاس', 'الولايات المتحدة',
-    const LatLng(36.1699, -115.1398),
-    'أحدث الابتكارات التقنية مع تركيز على الاستدامة: شركات ناشئة وكبرى تعرض حلولًا في كفاءة الطاقة والتقنيات المتجددة والمباني الخضراء، مع عروض حية وجلسات نقاش.',
-  ),
-];
 
 class FakePathProvider extends PathProviderPlatform {
   FakePathProvider(this.path);
@@ -223,10 +161,6 @@ void main() {
 
     await tester.runAsync(() async {
       await Hive.deleteFromDisk();
-      if (lang == 'ar') {
-        final box = await Hive.openBox<EventModel>('eventsBox');
-        await box.addAll(arabicEvents);
-      }
       await provider.getEvent();
       for (final index in favorites) {
         await provider.toggleFavorite(provider.events[index]);

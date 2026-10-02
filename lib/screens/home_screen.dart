@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 import '../models/event_model.dart';
+import '../models/event_text.dart';
 import '../services/navigation_services.dart';
 import '../themes/app_theme.dart';
 import '../widgets/app_widgets.dart';
@@ -71,10 +72,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _updateFilteredEvents() {
     final category = _categories[selectedCategory].$2;
+    final query = searchQuery.toLowerCase();
     setState(() {
       filteredEvents = allEvents.where((event) {
+        // Categories match the stored English title; search matches either language
         final title = event.title.toLowerCase();
-        return title.contains(searchQuery.toLowerCase()) &&
+        final arabicTitle = event.arabicText?.title ?? '';
+        return (title.contains(query) || arabicTitle.contains(query)) &&
             title.contains(category);
       }).toList();
     });

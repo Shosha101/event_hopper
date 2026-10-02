@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:event_hopper/models/event_model.dart';
+import 'package:event_hopper/models/event_text.dart';
 import 'package:event_hopper/themes/app_theme.dart';
 import 'package:event_hopper/widgets/app_widgets.dart';
 import 'package:event_hopper/widgets/events_map.dart';
@@ -16,6 +17,7 @@ class EventDetailsScreen extends StatelessWidget {
     final deviceHeight = MediaQuery.of(context).size.height;
     final topInset = MediaQuery.of(context).padding.top;
     final heroHeight = deviceHeight * 0.40;
+    final text = event.text(context);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -52,7 +54,7 @@ class EventDetailsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     ContentText(
-                      event.title,
+                      text.title,
                       style: const TextStyle(
                         fontSize: 24,
                         height: 1.3,
@@ -70,14 +72,14 @@ class EventDetailsScreen extends StatelessWidget {
                     _InfoRow(
                       icon: Icons.location_on_outlined,
                       label: context.tr('details_location'),
-                      value: event.location,
+                      value: text.location,
                     ),
                     const SizedBox(height: 24),
                     _SectionTitle(context.tr('details_about')),
                     const SizedBox(height: 8),
                     Text(
-                      event.about,
-                      textDirection: Bidi.detectRtlDirectionality(event.about)
+                      text.about,
+                      textDirection: Bidi.detectRtlDirectionality(text.about)
                           ? TextDirection.rtl
                           : TextDirection.ltr,
                       style: const TextStyle(

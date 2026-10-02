@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:event_hopper/models/event_model.dart';
+import 'package:event_hopper/models/event_text.dart';
 import 'package:event_hopper/providers/event_provider.dart';
 import 'package:event_hopper/themes/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -352,5 +353,6 @@ String formatEventDateTime(BuildContext context, DateTime dateTime) {
 
 /// City and country of an event joined with the current language's comma.
 String formatEventPlace(BuildContext context, EventModel event) {
-  return context.tr('place_format', args: [event.city, event.country]);
+  final text = event.text(context);
+  return context.tr('place_format', args: [text.city, text.country]);
 }

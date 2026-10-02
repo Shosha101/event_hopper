@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:event_hopper/models/event_model.dart';
+import 'package:event_hopper/models/event_text.dart';
 import 'package:event_hopper/providers/event_provider.dart';
 import 'package:event_hopper/services/navigation_services.dart';
 import 'package:event_hopper/themes/app_theme.dart';
@@ -122,7 +123,7 @@ class _SelectedEventCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     ContentText(
-                      event.title,
+                      event.text(context).title,
                       maxLines: 2,
                       style: const TextStyle(
                         fontSize: 15.5,
