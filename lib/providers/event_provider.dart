@@ -11,6 +11,27 @@ class EventProvider extends ChangeNotifier {
 
   List<EventModel> get events => _events;
 
+  // Events have no id, so favorites are tracked by title
+  Set<String> _favoriteTitles = {};
+
+  List<EventModel> get favoriteEvents => _events.where(isFavorite).toList();
+
+  bool isFavorite(EventModel event) => _favoriteTitles.contains(event.title);
+
+  Future<void> toggleFavorite(EventModel event) async {
+    final isNowFavorite = !_favoriteTitles.remove(event.title);
+    if (isNowFavorite) {
+      _favoriteTitles.add(event.title);
+    }
+    notifyListeners();
+
+    try {
+      await _hiveService.setFavorite(event.title, isNowFavorite);
+    } catch (e) {
+      logger.e('Error saving favorite: $e');
+    }
+  }
+
   // Load events from Hive and add mock data if necessary
   Future<void> getEvent() async {
     try {
@@ -23,6 +44,8 @@ class EventProvider extends ChangeNotifier {
         await _hiveService.addMockData();
         _events = await _hiveService.getEvents(); // Reload events after adding mock data
       }
+
+      _favoriteTitles = (await _hiveService.getFavorites()).toSet();
 
       notifyListeners(); // Notify listeners that events are updated
     } catch (e) {

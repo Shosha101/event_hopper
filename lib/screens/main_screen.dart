@@ -1,96 +1,100 @@
-import 'dart:io';
-
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
+import 'package:event_hopper/themes/app_theme.dart';
+import 'package:event_hopper/widgets/events_map.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'event_map_screen.dart';
+import 'favorite_screen.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
+  final EventsMapBuilder? mapBuilder;
+
+  const MainScreen({super.key, this.mapBuilder});
+
   @override
   State<StatefulWidget> createState() {
     return _MainScreen();
   }
 }
 
-int _selectedIndex = 0;
-final List<Widget> _pages = [
-  HomeScreen(),
-  // FavoriteScreen(),
-  ProfileScreen(),
-  ProfileScreen(),
-];
-
 class _MainScreen extends State<MainScreen> {
+  int _selectedIndex = 0;
+
+  void _selectPage(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool isMobile = Platform.isAndroid || Platform.isIOS;
+    bool isMobile = defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS;
+
+    final List<Widget> pages = [
+      const HomeScreen(),
+      EventMapScreen(mapBuilder: widget.mapBuilder),
+      FavoriteScreen(onBrowseEvents: () => _selectPage(0)),
+      const ProfileScreen(),
+    ];
+
+    final destinations = [
+      (Icons.home_outlined, Icons.home, context.tr('nav_home')),
+      (Icons.map_outlined, Icons.map, context.tr('nav_map')),
+      (Icons.favorite_border, Icons.favorite, context.tr('nav_favorites')),
+      (Icons.person_outline, Icons.person, context.tr('nav_profile')),
+    ];
 
     return Scaffold(
       body: Row(
         children: [
           if (!isMobile)
-            Center(
+            DecoratedBox(
+              decoration: const BoxDecoration(
+                border: BorderDirectional(
+                  end: BorderSide(color: AppColors.border),
+                ),
+              ),
               child: NavigationRail(
                 selectedIndex: _selectedIndex,
-                onDestinationSelected: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-                selectedIconTheme: const IconThemeData(
-                  color: Color.fromRGBO(244, 63, 139, 1.0),
-                ),
-                unselectedIconTheme: const IconThemeData(
-                  color: Colors.grey,
-                ),
-                backgroundColor: Colors.white,
+                onDestinationSelected: _selectPage,
+                groupAlignment: 0,
                 labelType: NavigationRailLabelType.all,
-                destinations: const [
-                  NavigationRailDestination(
-                    icon: Icon(Icons.home),
-                    label: Text('Home'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.favorite),
-                    label: Text('Favorite'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.person),
-                    label: Text('Profile'),
-                  ),
+                destinations: [
+                  for (final (icon, selectedIcon, label) in destinations)
+                    NavigationRailDestination(
+                      icon: Icon(icon),
+                      selectedIcon: Icon(selectedIcon),
+                      label: Text(label),
+                    ),
                 ],
               ),
             ),
           Expanded(
-            child: _pages[_selectedIndex],
+            child: pages[_selectedIndex],
           ),
         ],
       ),
       bottomNavigationBar: isMobile
-          ? BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              onTap: (value) {
-                setState(() {
-                  _selectedIndex = value;
-                });
-              },
-              selectedItemColor: const Color.fromRGBO(244, 63, 139, 1.0),
-              unselectedItemColor: Colors.grey,
-              backgroundColor: Colors.white,
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite),
-                  label: 'Favorite',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'Profile',
-                ),
-              ],
+          ? DecoratedBox(
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: AppColors.border)),
+              ),
+              child: NavigationBar(
+                selectedIndex: _selectedIndex,
+                onDestinationSelected: _selectPage,
+                destinations: [
+                  for (final (icon, selectedIcon, label) in destinations)
+                    NavigationDestination(
+                      icon: Icon(icon),
+                      selectedIcon: Icon(selectedIcon),
+                      label: label,
+                    ),
+                ],
+              ),
             )
           : null,
     );

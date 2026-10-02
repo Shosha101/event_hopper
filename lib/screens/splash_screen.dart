@@ -7,6 +7,7 @@ import 'package:logger/logger.dart';
 import '../Adapters/lating_adapter.dart';
 import '../services/hive_service.dart';
 import '../services/navigation_services.dart';
+import '../themes/app_theme.dart';
 
 class SplashPage extends StatefulWidget {
   final VoidCallback onInitializationComplete;
@@ -26,17 +27,27 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: Container(
-          height: 250,
-          width: 250,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/logo.png'),
-              fit: BoxFit.contain,
-            ),
+    // Runs before the app widget exists, so there is no theme or text direction yet
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Container(
+        color: AppColors.background,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // The logo image carries the app name
+              Image.asset('assets/images/logo.png', width: 250),
+              const SizedBox(height: 36),
+              const SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -51,7 +62,7 @@ class _SplashPageState extends State<SplashPage> {
     WidgetsFlutterBinding.ensureInitialized();
 
     try {
-      Hive.initFlutter(); // Initialize Hive first
+      await Hive.initFlutter(); // Initialize Hive first
       Hive.registerAdapter(LatLngAdapter());
 
       _registerServices(); // Register other services

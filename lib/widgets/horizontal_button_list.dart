@@ -2,39 +2,38 @@
 
 import 'package:flutter/material.dart';
 
-import 'rounded_button_widget.dart';
-
 class HorizontalButtonList extends StatelessWidget {
   final List<String> buttonTexts;
+  final int selectedIndex;
   final double buttonHeight;
   final double buttonPadding;
-  final Color buttonColor;
-  final void Function(String) onPressed;
+  final EdgeInsetsGeometry padding;
+  final void Function(int) onPressed;
 
   const HorizontalButtonList({
-    Key? key,
+    super.key,
     required this.buttonTexts,
+    required this.selectedIndex,
     required this.buttonHeight,
     required this.buttonPadding,
-    required this.buttonColor,
     required this.onPressed,
-  }) : super(key: key);
+    this.padding = EdgeInsets.zero,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: buttonHeight,
-      child: ListView.builder(
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
+        padding: padding,
         itemCount: buttonTexts.length,
+        separatorBuilder: (context, index) => SizedBox(width: buttonPadding),
         itemBuilder: (context, index) {
-          return Padding(
-            padding: EdgeInsets.only(right: buttonPadding),
-            child: RoundedButton(
-              text: buttonTexts[index],
-              color: buttonColor,
-              onPressed: () => onPressed(buttonTexts[index]),
-            ),
+          return ChoiceChip(
+            label: Text(buttonTexts[index]),
+            selected: index == selectedIndex,
+            onSelected: (_) => onPressed(index),
           );
         },
       ),

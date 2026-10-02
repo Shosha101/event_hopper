@@ -1,84 +1,67 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
+import 'package:event_hopper/providers/event_provider.dart';
+import 'package:event_hopper/widgets/app_widgets.dart';
 import 'package:event_hopper/widgets/event_card_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 
 import '../services/navigation_services.dart';
+import 'event_details_screen.dart';
 
 class FavoriteScreen extends StatelessWidget {
-  late double _deviceHeight;
-  late double _deviceWidth;
+  // Called from the empty state to send the user back to the events list.
+  final VoidCallback? onBrowseEvents;
 
-  final List<Map<String, String>> _events = [
-    {
-      'imageLoc': 'assets/images/music.jpg',
-      'title': 'Music Concert',
-      'dateTime': 'Dec 25, 2024 | 7:00 PM',
-      'location': 'City Hall, Downtown',
-    },
-    {
-      'imageLoc': 'assets/images/music.jpg',
-      'title': 'Art Exhibition',
-      'dateTime': 'Jan 10, 2025 | 11:00 AM',
-      'location': 'Art Gallery, Main Street',
-    },
-    {
-      'imageLoc': 'assets/images/music.jpg',
-      'title': 'Tech Conference',
-      'dateTime': 'Feb 15, 2025 | 9:00 AM',
-      'location': 'Tech Park, Silicon Valley',
-    },
-  ];
+  const FavoriteScreen({super.key, this.onBrowseEvents});
 
   @override
   Widget build(BuildContext context) {
-    _deviceHeight = MediaQuery.of(context).size.height;
-    _deviceWidth = MediaQuery.of(context).size.width;
-
-    // Determine the number of columns based on screen width
-    int crossAxisCount = 1; // Default for narrow screens
-    if (_deviceWidth > 1200) {
-      crossAxisCount = 3; // Desktop or large tablets
-    } else if (_deviceWidth > 800) {
-      crossAxisCount = 2; // Medium tablets or small desktop screens
-    }
+    final events = context.watch<EventProvider>().favoriteEvents;
 
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: _deviceWidth * 0.04,
-                vertical: _deviceHeight * 0.02,
-              ),
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 10.0,
-                  mainAxisSpacing: 10.0,
-                  childAspectRatio: 0.8, // Adjust the aspect ratio for the cards
+      body: SafeArea(
+        bottom: false,
+        child: CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              sliver: SliverToBoxAdapter(
+                child: ScreenHeader(
+                  title: context.tr('favorites_title'),
+                  subtitle: events.isEmpty
+                      ? null
+                      : context.plural('events_count', events.length),
                 ),
-                itemCount: _events.length,
-                itemBuilder: (context, index) {
-                  final event = _events[index];
-                  return InkWell(
-                    onTap: () {
-                        NavigationService().navigateToRoute('/detail');
-
-                    },
-                    child: EventCardWidget(
-                      imageLoc: event['imageLoc']!,
-                      title: event['title']!,
-                      dateTime: event['dateTime']!,
-                      location: event['location']!,
-                    ),
-                  );
-                },
               ),
             ),
-          ),
-        ],
+            if (events.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: StateMessage(
+                    icon: Icons.favorite_border,
+                    title: context.tr('favorites_empty_title'),
+                    body: context.tr('favorites_empty_body'),
+                    actionLabel: context.tr('browse_events'),
+                    onAction: onBrowseEvents,
+                  ),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                sliver: EventCardsSliver(
+                  events: events,
+                  onTap: (event) {
+                    GetIt.instance<NavigationService>().navigateToPage(
+                      EventDetailsScreen(event: event),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

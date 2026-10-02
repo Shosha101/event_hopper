@@ -6,6 +6,7 @@ import '../models/event_model.dart';
 
 class HiveService {
   Box<EventModel>? _eventBox; // Change to nullable type
+  Box<String>? _favoriteBox;
   final Logger logger = Logger();
 
   // This ensures the box is open before anything is done with it.
@@ -20,6 +21,10 @@ class HiveService {
         _eventBox = await Hive.openBox<EventModel>('eventsBox');
         logger.i('Events box opened');
       }
+
+      if (_favoriteBox == null || !_favoriteBox!.isOpen) {
+        _favoriteBox = await Hive.openBox<String>('favoritesBox');
+      }
     } catch (e) {
       logger.e('Error initializing Hive: $e');
       rethrow;
@@ -32,6 +37,29 @@ class HiveService {
       await openBox(); // Ensure the box is open before fetching events
     }
     return _eventBox!.values.toList();
+  }
+
+  // Titles of the events saved as favorites
+  Future<List<String>> getFavorites() async {
+    if (_favoriteBox == null || !_favoriteBox!.isOpen) {
+      await openBox();
+    }
+    return _favoriteBox!.values.toList();
+  }
+
+  // Save or remove a favorite. Titles are stored as values because Hive keys must be ASCII.
+  Future<void> setFavorite(String title, bool isFavorite) async {
+    if (_favoriteBox == null || !_favoriteBox!.isOpen) {
+      await openBox();
+    }
+    final keys = _favoriteBox!.keys
+        .where((key) => _favoriteBox!.get(key) == title)
+        .toList();
+    if (isFavorite && keys.isEmpty) {
+      await _favoriteBox!.add(title);
+    } else if (!isFavorite) {
+      await _favoriteBox!.deleteAll(keys);
+    }
   }
 
   // Adding mock data
@@ -119,6 +147,9 @@ class HiveService {
     if (_eventBox != null && _eventBox!.isOpen) {
       await _eventBox!.close();
       logger.i("Hive closed.");
+    }
+    if (_favoriteBox != null && _favoriteBox!.isOpen) {
+      await _favoriteBox!.close();
     }
   }
 }

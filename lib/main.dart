@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_hopper/providers/event_provider.dart';
 import 'package:event_hopper/screens/main_screen.dart';
 import 'package:flutter/material.dart';
@@ -5,16 +6,29 @@ import 'package:get_it/get_it.dart';
 import 'package:event_hopper/screens/splash_screen.dart';
 import 'package:event_hopper/services/hive_service.dart';
 import 'package:event_hopper/services/navigation_services.dart';
+import 'package:event_hopper/themes/app_theme.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 import 'Adapters/lating_adapter.dart';
 
-void main()  {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
 
   runApp(SplashPage(onInitializationComplete: () {
-    runApp(MyApp());
+    runApp(
+      EasyLocalization(
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        path: 'assets/translations',
+        fallbackLocale: const Locale('en'),
+        startLocale: const Locale('ar'),
+        // Arabic needs its own plural forms (3 to 10, 11 and up)
+        ignorePluralRules: false,
+        child: MyApp(),
+      ),
+    );
   }));
 }
 
@@ -59,9 +73,12 @@ class _MyAppState extends State<MyApp> {
         navigatorKey: NavigationService.navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'EventHopper',
-        theme: ThemeData.light(),
+        theme: AppTheme.light,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
         routes: {
-          '/main': (BuildContext context) => MainScreen(),
+          '/main': (BuildContext context) => const MainScreen(),
         },
       ),
     );
